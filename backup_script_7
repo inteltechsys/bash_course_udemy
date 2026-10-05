@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Author: Denis Clairbois
+# Date Created: 2024-06-10
+# Last Modified: 2024-06-10
+
+# Description: This script is used
+# to easily backup the directory given as argument.
+
+# Usage: ./backup_script_7 <directory>
+
+source_dir="$1"
+
+if [ -z "$source_dir" ]; then
+    echo "Usage: $0 <directory>" >&2
+    exit 1
+fi
+
+if [ ! -d "$source_dir" ]; then
+    echo "Error: '$source_dir' is not a directory" >&2
+    exit 1
+fi
+
+name=$(basename "$source_dir")
+
+mkdir -p ~/backup_bash_course
+
+tar -czvf ~/backup_bash_course/"$name".tar.gz "$source_dir"
