@@ -2,27 +2,40 @@
 
 # Author: Denis Clairbois
 # Date Created: 2024-06-10
-# Last Modified: 2024-06-10
+# Last Modified: 2026-10-05
 
 # Description: This script is used
 # to easily backup the directory given as argument.
 
 # Usage: ./backup_script_7 <directory>
 
+# The first command-line argument is the directory to back up
 source_dir="$1"
 
+# Check that an argument was given (-z is true if the string is empty).
+# Print the usage message on stderr (>&2) and exit with error code 1.
+# $0 is the name of the script as it was called.
 if [ -z "$source_dir" ]; then
     echo "Usage: $0 <directory>" >&2
     exit 1
 fi
 
+# Check that the argument is an existing directory (-d)
 if [ ! -d "$source_dir" ]; then
     echo "Error: '$source_dir' is not a directory" >&2
     exit 1
 fi
 
+# Keep only the directory name (without its path) to name the archive,
+# e.g. /home/denis/bash_course -> bash_course
 name=$(basename "$source_dir")
 
+# Create the destination directory if needed (-p: no error if it exists)
 mkdir -p ~/backup_bash_course
 
+# Create the compressed archive:
+#   c = create an archive
+#   z = compress it with gzip
+#   v = verbose (list each file added)
+#   f = the archive file name follows
 tar -czvf ~/backup_bash_course/"$name".tar.gz "$source_dir"

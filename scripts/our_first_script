@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo  "This is my first script"
+
+
+
+#lt result="4 * 5"
+result=$((4 * 5))
+echo "The result of 4 * 5 is: $result"
+echo ${result}
+
+exit 0

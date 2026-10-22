@@ -1,0 +1,121 @@
+#!/bin/bash
+
+# Author: Denis Clairbois
+# Date Created: 2026-10-05
+# Last Modified: 2026-10-05
+
+# Description: This script is a test suite for backup_script_7.
+# It runs backup_script_7 in several situations and checks the results.
+# A temporary HOME is used so the real ~/backup_bash_course is never touched.
+
+# Usage: ./test_backup_script_7 [path/to/backup_script_7]
+# Exit code: 0 if all tests pass, 1 if at least one test fails.
+
+# Script under test: first argument, or backup_script_7 next to this file
+SCRIPT="${1:-$(dirname "$0")/backup_script_7}"
+SCRIPT=$(realpath "$SCRIPT")
+
+if [ ! -x "$SCRIPT" ]; then
+    echo "Error: '$SCRIPT' is not an executable file" >&2
+    exit 1
+fi
+
+# Temporary HOME: the '~' used by the script will point here.
+# The trap removes it when this test script exits, even after an error.
+TEST_HOME=$(mktemp -d)
+trap 'rm -rf "$TEST_HOME"' EXIT
+export HOME="$TEST_HOME"
+
+BACKUP_DIR="$HOME/backup_bash_course"
+WORK_DIR="$TEST_HOME/work"
+mkdir -p "$WORK_DIR"
+
+pass=0
+fail=0
+
+# check "description" command [args...]
+# Runs the command; it passes if the command returns 0.
+check() {
+    local description="$1"
+    shift
+    if "$@"; then
+        echo "PASS: $description"
+        pass=$((pass + 1))
+    else
+        echo "FAIL: $description"
+        fail=$((fail + 1))
+    fi
+}
+
+# contains "text" "substring": true if text contains substring
+contains() {
+    [[ "$1" == *"$2"* ]]
+}
+
+# Run the script, keeping its output and exit code in $out and $rc.
+# '|| rc=$?' keeps the exit code without stopping on a non-zero value.
+run_script() {
+    rc=0
+    out=$("$SCRIPT" "$@" 2>&1) || rc=$?
+}
+
+# --- Test 1: no argument ---
+run_script
+check "no argument: exit code is 1" test "$rc" -eq 1
+check "no argument: usage message is shown" contains "$out" "Usage"
+
+# --- Test 2: directory does not exist ---
+run_script "$WORK_DIR/does_not_exist"
+check "missing directory: exit code is 1" test "$rc" -eq 1
+check "missing directory: error message is shown" contains "$out" "is not a directory"
+
+# --- Test 3: argument is a file, not a directory ---
+touch "$WORK_DIR/a_file"
+run_script "$WORK_DIR/a_file"
+check "file instead of directory: exit code is 1" test "$rc" -eq 1
+
+# --- Test 7 (part 1): nothing is created when the arguments are invalid ---
+check "destination is not created after errors" test ! -e "$BACKUP_DIR"
+
+# --- Test 4: valid directory with two files ---
+mkdir "$WORK_DIR/project"
+echo "one" > "$WORK_DIR/project/file1.txt"
+echo "two" > "$WORK_DIR/project/file2.txt"
+run_script "$WORK_DIR/project"
+check "valid directory: exit code is 0" test "$rc" -eq 0
+check "valid directory: archive is created" test -f "$BACKUP_DIR/project.tar.gz"
+listing=$(tar -tzf "$BACKUP_DIR/project.tar.gz" 2>&1)
+check "valid directory: archive contains file1.txt" contains "$listing" "project/file1.txt"
+check "valid directory: archive contains file2.txt" contains "$listing" "project/file2.txt"
+
+# --- Test 7 (part 2): destination directory was created by the script ---
+check "destination directory is created by the script" test -d "$BACKUP_DIR"
+
+# --- Test 5: directory name with spaces ---
+mkdir "$WORK_DIR/my project"
+echo "x" > "$WORK_DIR/my project/notes.txt"
+run_script "$WORK_DIR/my project"
+check "name with spaces: exit code is 0" test "$rc" -eq 0
+check "name with spaces: archive is created" test -f "$BACKUP_DIR/my project.tar.gz"
+
+# --- Test 6: empty directory ---
+mkdir "$WORK_DIR/empty_dir"
+run_script "$WORK_DIR/empty_dir"
+check "empty directory: exit code is 0" test "$rc" -eq 0
+check "empty directory: archive is created" test -f "$BACKUP_DIR/empty_dir.tar.gz"
+
+# --- Test 8: second backup of the same directory overwrites the archive ---
+echo "three" > "$WORK_DIR/project/file3.txt"
+run_script "$WORK_DIR/project"
+check "second backup: exit code is 0" test "$rc" -eq 0
+listing=$(tar -tzf "$BACKUP_DIR/project.tar.gz" 2>&1)
+check "second backup: archive contains the new file" contains "$listing" "project/file3.txt"
+
+# --- Summary ---
+echo
+echo "Results: $pass passed, $fail failed"
+
+if [ "$fail" -gt 0 ]; then
+    exit 1
+fi
+exit 0

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Author: Denis Clairbois
+# Date Created: 2024-06-10
+# Last Mofified: 2024-06-10
+
+# Description: This script is used to demonstrate the use of variables,
+# arithmetic operations, and basic output in bash scripting.
+
+# Usage: ./our_second_script.sh
+
+
+
+
+
+
+echo "This is may second script."
+
+
+
+
+exit 0
