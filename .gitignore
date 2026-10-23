@@ -1,1 +1,3 @@
 netman-log.txt
+.claude/backups/
+__pycache__/
