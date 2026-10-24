@@ -1,6 +1,12 @@
 # bash_course_udemy
 
-Personal bash scripting / pentest training repo, worked through alongside the Anthropic Academy "Claude Code" courses.
+Personal training repo for the Udemy course ["Bash Mastery: The Complete Guide to Bash Shell Scripting"](https://www.udemy.com/course/bash-mastery/), by Denis Clairbois. The repo also contains Python scripts used for general scripting practice, alongside the bash material.
+
+## Branches
+
+- `main` — primary branch, holding the current state of the course work.
+- `tests` — training branch, used to practice Git branching and merging workflows without touching `main`.
+- `sandbox` — training branch, used for free experimentation (trying out ideas, scratch work) with no risk to `main`.
 
 ## Claude Code plugin
 
