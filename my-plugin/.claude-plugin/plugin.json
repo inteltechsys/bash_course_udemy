@@ -1,0 +1,8 @@
+{
+  "name": "bash-course-plugin",
+  "description": "Hooks de sécurité et de qualité, un skill et un agent de revue pour le repo bash_course (block-push-main, check-shellcheck, save-before-compact, nouveau-script, bash-reviewer)",
+  "version": "1.0.0",
+  "author": {
+    "name": "Denis Clairbois"
+  }
+}

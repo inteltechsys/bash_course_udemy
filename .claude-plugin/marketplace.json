@@ -1,0 +1,14 @@
+{
+  "name": "bash-course-marketplace",
+  "description": "In-repo Claude Code marketplace for bash_course_udemy, bundled alongside the plugin it distributes",
+  "owner": {
+    "name": "Denis Clairbois"
+  },
+  "plugins": [
+    {
+      "name": "bash-course-plugin",
+      "source": "./my-plugin",
+      "description": "Hooks de sécurité et de qualité, skill et agent de revue pour scripts bash"
+    }
+  ]
+}
